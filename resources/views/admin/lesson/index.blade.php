@@ -28,10 +28,10 @@
 		<input type="text" onfocus="WdatePicker({ maxDate:'#F{$dp.$D(\'datemax\')||\'%y-%M-%d\'}' })" id="datemin" class="input-text Wdate" style="width:120px;">
 		-
 		<input type="text" onfocus="WdatePicker({ minDate:'#F{$dp.$D(\'datemin\')}',maxDate:'%y-%M-%d' })" id="datemax" class="input-text Wdate" style="width:120px;">
-		<input type="text" class="input-text" style="width:250px" placeholder="输入会员名称、电话、邮箱" id="" name="">
-		<button type="submit" class="btn btn-success radius" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜用户</button>
+		<input type="text" class="input-text" style="width:250px" placeholder="输入课时名称" id="title" name="">
+		<button type="submit" class="btn btn-success radius" id="search" name=""><i class="Hui-iconfont">&#xe665;</i> 搜用户</button>
 	</div>
-	<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> <a href="javascript:;" onclick="member_add('添加用户','member-add.html','','510')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加用户</a></span> <span class="r">共有数据：<strong>88</strong> 条</span> </div>
+	<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> <a href="javascript:;" onclick="lesson_add()" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加课时</a></span> <span class="r">共有数据：<strong>88</strong> 条</span> </div>
 	<div class="mt-20">
 	<table class="table table-border table-bordered table-hover table-bg table-sort">
 		<thead>
@@ -40,8 +40,8 @@
 				<th width="50">ID</th>
 				<th width="100">课时名称</th>
 				<th width="60">课程名称</th>
-				<th width="90">专业名称</th>
-				<th width="150">缩略图</th>
+				<th width="80">视频播放</th>
+				<th width="120">缩略图</th>
 				<th width="100">讲师名称</th>
 				<th width="130">加入时间</th>
 				<th width="70">状态</th>
@@ -50,7 +50,7 @@
 		</thead>
 		<tbody>
 			<tr class="text-c">
-				<td><input type="checkbox" value="1" name=""></td>
+				<td><input type="checkbox" value="1" id="ids[]" name=""></td>
 				<td>1</td>
 				<td><u style="cursor:pointer" class="text-primary" onclick="member_show('张三','member-show.html','10001','360','400')">张三</u></td>
 				<td>男</td>
@@ -77,7 +77,11 @@
 <script type="text/javascript" src="{{asset('admins')}}/lib/laypage/1.2/laypage.js"></script>
 <script type="text/javascript">
 $(function(){
-	$('.table-sort').dataTable({
+	$('#search').click(function(){
+		table.api().ajax.reload();
+	});
+
+	table = $('.table-sort').dataTable({
 		'lengthMenu':[[1,5,10,20,50,-1],[1,5,10,20,50,'所有']], //显示数据行数
 		'paging':true,	//显示分页
 		'info':true,	//左下角信息
@@ -97,6 +101,11 @@ $(function(){
 			"url": "{{url('admin/lesson/index')}}",
 			"type": "POST",
 			'headers': { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' },
+			data:function(data){
+				data.title = $('#title').val();
+				data.datemax=$('#datemax').val();
+				data.datemin=$('#datemin').val();
+			}
 
 		},
 		'columns':[
@@ -104,7 +113,7 @@ $(function(){
 			{'data':'id'},
 			{'data':'lesson_name'},
 			{'data':'course.course_name'},
-			{'data':'course.profession.profession_name'},
+			{'data':'a','defaultContent':'视频'},
 			{'data':'a','defaultContent':'缩略图'},
 			{'data':'teacher_name'},
 			{'data':'created_at'},
@@ -116,39 +125,53 @@ $(function(){
 			$(row).addClass('text-c')
 			$(row).find('td').eq(0).html('<input type="checkbox" name="ids[]" value="'+data.id+'">');
 			if(data.status==1){
-				var str='<a style="text-decoration:none" onClick="admin_stop(this,\'10001\')" href="javascript:;" title="停用"><i class="Hui-iconfont">&#xe631;</i></a>';
+				var str='<a style="text-decoration:none" onClick="lesson_stop(this,'+data.id+')" href="javascript:;" title="停用"><i class="Hui-iconfont">&#xe631;</i></a>';
 				$(row).find('td:eq(8)').html('<span class="label label-success radius">已启用</span>');
 			}else{
-				var str='<a style="text-decoration:none" onClick="admin_start(this,\'10001\')" href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe615;</i></a>'
+				var str='<a style="text-decoration:none" onClick="lesson_start(this,'+data.id+')" href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe615;</i></a>'
 				$(row).find('td:eq(8)').html('<span class="label  radius">已停用</span>');
 			}
-			$(row).find('td:eq(9)').html(str+'<a title="编辑" href="javascript:;" onclick="admin_edit()" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a> <a title="删除" href="javascript:;" onclick="admin_del()" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a></td>');
+			$(row).find('td:eq(9)').html(str+'<a title="编辑" href="javascript:;" onclick="lesson_update('+data.id+')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a> <a title="删除" href="javascript:;" onclick="lesson_del(this,'+data.id+')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a></td>');
+			$(row).find('td:eq(4)').html('<input onclick ="play('+data.id+')" class="btn btn-success-outline radius" type="button" value="播放">');
+			$(row).find('td:eq(5)').html('<img src="'+data.cover_img+'" width=100px/>');
 		}
 
 
 	});
 
 });
+//播放视频
+function play(id){
+	layer_show("播放视频","{{url('admin/lesson/play')}}/"+id,800,600);
+}
 /*用户-添加*/
-function member_add(title,url,w,h){
-	layer_show(title,url,w,h);
+function lesson_add(){
+	layer_show("添加课时",'{{url('admin/lesson/add')}}');
 }
 /*用户-查看*/
 function member_show(title,url,id,w,h){
 	layer_show(title,url,w,h);
 }
 /*用户-停用*/
-function member_stop(obj,id){
+function lesson_stop(obj,id){
 	layer.confirm('确认要停用吗？',function(index){
 		$.ajax({
 			type: 'POST',
-			url: '',
+			url: '{{url("admin/lesson/status")}}/'+id,
+			data:{'status':0,'_token':'{{csrf_token()}}'},
 			dataType: 'json',
 			success: function(data){
-				$(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="member_start(this,id)" href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe6e1;</i></a>');
-				$(obj).parents("tr").find(".td-status").html('<span class="label label-defaunt radius">已停用</span>');
-				$(obj).remove();
-				layer.msg('已停用!',{icon: 5,time:1000});
+				if(data.info==1){
+					//停用成功
+					$(obj).parents("tr").find('td:eq(8)').html('<span class="label label-defaunt radius">已停用</span>');			
+					$(obj).after('<a style="text-decoration:none" onClick="admin_start(this,'+id+')" href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe615;</i>');
+					$(obj).remove();
+					layer.msg('已停用!',{icon: 6,time:1000});
+				}else{
+					//停用失败
+					layer.msg('停用失败!',{icon: 5,time:1000});
+				}
+				
 			},
 			error:function(data) {
 				console.log(data.msg);
@@ -158,17 +181,26 @@ function member_stop(obj,id){
 }
 
 /*用户-启用*/
-function member_start(obj,id){
+function lesson_start(obj,id){
 	layer.confirm('确认要启用吗？',function(index){
 		$.ajax({
 			type: 'POST',
-			url: '',
+			url: '{{url("admin/lesson/status")}}/'+id,
+			data:{'status':1,'_token':'{{csrf_token()}}'},
 			dataType: 'json',
 			success: function(data){
-				$(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="member_stop(this,id)" href="javascript:;" title="停用"><i class="Hui-iconfont">&#xe631;</i></a>');
-				$(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已启用</span>');
-				$(obj).remove();
-				layer.msg('已启用!',{icon: 6,time:1000});
+				if(data.info==1){
+					//启动成功
+					$(obj).parents("tr").find('td:eq(8)').html('<span class="label label-success radius">已启用</span>');			
+					$(obj).after('<a style="text-decoration:none" onClick="lesson_stop(this,'+id+')" href="javascript:;" title="停用"><i class="Hui-iconfont">&#xe631;</i>');
+					$(obj).remove();
+					layer.msg('启动成功!',{icon: 6,time:1000});
+				}else{
+					//停用失败
+					layer.msg('停用失败!',{icon: 5,time:1000});
+				}
+				
+				
 			},
 			error:function(data) {
 				console.log(data.msg);
@@ -176,29 +208,57 @@ function member_start(obj,id){
 		});
 	});
 }
-/*用户-编辑*/
-function member_edit(title,url,id,w,h){
-	layer_show(title,url,w,h);
+/*课时-编辑*/
+function lesson_update(id){
+	layer_show("修改课时","{{url('admin/lesson/update')}}/"+id);
 }
 /*密码-修改*/
 function change_password(title,url,id,w,h){
 	layer_show(title,url,w,h);
 }
-/*用户-删除*/
-function member_del(obj,id){
+/*课时-删除*/
+function lesson_del(obj,id){
 	layer.confirm('确认要删除吗？',function(index){
 		$.ajax({
 			type: 'POST',
-			url: '',
+			url: '{{url("admin/lesson/del")}}/'+id,
+			data:{'_token':'{{csrf_token()}}'},
 			dataType: 'json',
 			success: function(data){
-				$(obj).parents("tr").remove();
-				layer.msg('已删除!',{icon:1,time:1000});
+				if(data.info==1){
+					$(obj).parents("tr").remove();
+					layer.msg('已删除!',{icon:1,time:1000});
+				}
+				
 			},
 			error:function(data) {
 				console.log(data.msg);
 			},
 		});		
+	});
+}
+
+function datadel(){
+	var ids=[];
+	$("input:checked").each(function(){
+		ids.push($(this).val());
+	});
+	if(ids.length==0){
+		alert("至少选择一个");
+	}
+	$.ajax({
+		type:"post",
+		url:"{{url('admin/lesson/datadel')}}",
+		data:{ids:ids,'_token':"{{csrf_token()}}"},
+		dataType:"json",
+		success:function(msg){
+			if(msg.info==1){
+				layer.msg('已删除!',{icon:1,time:1000});
+				table.api().ajax.reload();
+			}
+		}
+
+
 	});
 }
 </script> 
