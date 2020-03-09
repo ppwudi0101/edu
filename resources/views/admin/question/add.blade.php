@@ -17,6 +17,7 @@
 <link rel="stylesheet" type="text/css" href="{{asset('admins')}}/static/h-ui.admin/css/H-ui.admin.css" />
 <link rel="stylesheet" type="text/css" href="{{asset('admins')}}/lib/Hui-iconfont/1.0.8/iconfont.css" />
 <link rel="stylesheet" type="text/css" href="{{asset('admins')}}/static/h-ui.admin/skin/default/skin.css" id="skin" />
+
 <link rel="stylesheet" type="text/css" href="{{asset('admins')}}/static/h-ui.admin/css/style.css" />
 <!--[if IE 6]>
 <script type="text/javascript" src="{{asset('admins')}}/lib/DD_belatedPNG_0.0.8a-min.js" ></script>
@@ -33,66 +34,66 @@
 	<form action="" method="post" class="form form-horizontal" id="form-admin-role-add">
 		{{csrf_field()}}
 		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色名称：</label>
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>试题名称：</label>
 			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="{{$role->role_name}}" placeholder="" id="roleName" name="role_name">
+				<input type="text" class="input-text" value="" placeholder="" id="roleName" name="question_name">
 			</div>
 		</div>
 		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-3">备注：</label>
+			<label class="form-label col-xs-4 col-sm-3">试题的分值：</label>
 			<div class="formControls col-xs-8 col-sm-9">
-				<input type="text" class="input-text" value="" placeholder="" id="" name="">
+				<input type="text" class="input-text" value="" placeholder="" id="" name="question_score">
 			</div>
 		</div>
 		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-3">网站角色：</label>
+			<label class="form-label col-xs-4 col-sm-3">试题类型：</label>
 			<div class="formControls col-xs-8 col-sm-9">
-				@foreach($priv_A as $a)
-				<dl class="permission-list">
-					
-					<dt>
-						<label>
-							<input type="checkbox" value="{{$a->id}}" class="priv_ids" name="priv_ids[]" id="user-Character-0" @if(in_array($a->id,$ids))
-							checked="checked"
-							@endif
-							>
-							{{$a->priv_name}}</label>
-					</dt>
-					<dd>
-					@foreach($priv_B as $b)
-						@if($b->parent_id==$a->id)
-						<dl class="cl permission-list2">
-							<dt>
-								<label class="">
-									<input type="checkbox" value="{{$b->id}}"  class="priv_ids" name="priv_ids[]" id="user-Character-0-0" 
-									@if(in_array($b->id,$ids))
-									checked="checked"
-									@endif>
-									{{$b->priv_name}}</label>
-							</dt>								
-							<dd>
-							@foreach($priv_C as $c)
-								@if($c->parent_id==$b->id)
-								<label class="">
-									<input type="checkbox" value="{{$c->id}}"  class="priv_ids" name="priv_ids[]" id="user"
-										@if(in_array($c->id,$ids))
-										checked="checked"
-										@endif
-									>
-									{{$c->priv_name}}</label>								
+				<input type="radio"  value="1" placeholder="" id="" name="question_type" checked="">单选
+				<input type="radio"  value="2" placeholder="" id="" name="question_type">多选
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">选项A：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="" name="option_a">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">选项B：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="" name="option_b">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">选项C：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="" name="option_c">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">选项D：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="" name="option_d">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">正确答案：</label>
+			<div class="formControls col-xs-8 col-sm-9 skin-minimal" >
+				<div class="check-box">
+					<label for="checkbox-1">A</label>
+					<input type="checkbox"  value="1" id="checkbox-1" name="question_answer[]">
+					<label for="checkbox-1">B</label>
+					<input type="checkbox" value="2" id="checkbox-2" name="question_answer[]">
+					<label for="checkbox-1">C</label>
+					<input type="checkbox" value="4" id="checkbox-3" name="question_answer[]">
+					<label for="checkbox-1">D</label>
+					<input type="checkbox"  value="8" id="checkbox-4" name="question_answer[]">
+				</div>
+				</div>
+			</div>
+		</div>
 
-								@endif
-							@endforeach								
-							</dd>
-						</dl>
-						@endif
-					@endforeach
-					</dd>
-					
-				</dl>
-				@endforeach
-			</div>
-		</div>
+		
 		<div class="row cl">
 			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
 				<button type="submit" class="btn btn-success radius" id="admin-role-save" name="admin-role-save"><i class="icon-ok"></i> 确定</button>
@@ -138,15 +139,11 @@ $(function(){
 
 $("#form-admin-role-add").submit(function(e){
 		e.preventDefault();//阻止表单默认提交
-		var len =$('.priv_ids:checked').length;
-		if(len<1){
-			layer.msg("至少选择一个吧",{icon:5,time:2000});
-			return false;
-		}
+	
 		data=$(this).serialize();
 		$.ajax({
 			type:"post",
-			url:"{{url('admin/role/update')}}/{{$role->id}}",
+			url:"{{url('admin/question/add/'.$paper->id)}}",
 			data:data,
 			dataType:'json',
 			success:function(msg){

@@ -48,6 +48,8 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
         Route::get("paper/index","PaperController@index");
         //试卷列表首页
         Route::get("question/index/{paper}","QuestionController@index");
+        //添加试题
+        Route::match(["get","post"],"question/add/{paper}","QuestionController@add");
 
     });
    
