@@ -3,7 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Answer;
 class Question extends Model
 {
     //
@@ -29,4 +29,20 @@ class Question extends Model
     	"14"=>"BCD",
     	"15"=>"ABCD"
     ];
+
+    public function is_right($result){
+        $answer=$this->question_answer;
+        if(($answer&$result)==$answer && ($answer&$result)==$result){
+            //答案正确
+            return ["score"=>$this->question_score,"right_wrong"=>"正确"];
+
+        }else{
+            return ["score"=>0,"right_wrong"=>"错误"];
+        }
+    }
+
+      public function answer(){
+        return $this->hasOne("App\Answer","question_id","id");
+
+    }
 }

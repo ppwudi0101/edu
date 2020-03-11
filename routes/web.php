@@ -70,7 +70,14 @@ Route::group(["namespace"=>"Home"],function(){
     Route::get('index','IndexController@index');
     //首页
     Route::get('/',"IndexController@index");
-
+    //开始考试
+    Route::get("person/paper","PersonController@paper");
+    //试卷
+    Route::get("person/exam/{paper}","PersonController@exam");
+    //学员答案结果
+    Route::post("person/answer/{paper}","PersonController@answer");
+    //试卷结果
+    Route::get("person/result/{paper}","PersonController@result");
 
 });
 
